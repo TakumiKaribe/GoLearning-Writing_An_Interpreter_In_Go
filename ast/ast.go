@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"strings"
 
-	"../token"
+	"monkey/token"
 )
 
 // Node 構文木のNode

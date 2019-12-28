@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"../token"
+	"monkey/token"
 )
 
 // Lexer 実体

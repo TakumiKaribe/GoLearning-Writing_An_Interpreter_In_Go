@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 
-	"../evaluator"
-	"../lexer"
-	"../parser"
+	"monkey/evaluator"
+	"monkey/lexer"
+	"monkey/parser"
 )
 
 // PROMPT プロンプト
