@@ -21,7 +21,7 @@ func TestLetStatements(t *testing.T) {
 
 	for _, tt := range tests {
 		l := lexer.New(tt.input)
-		p := New(l, true)
+		p := New(l, false)
 		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
@@ -76,7 +76,7 @@ func TestReturnStatements(t *testing.T) {
 
 	for _, tt := range tests {
 		l := lexer.New(tt.input)
-		p := New(l, true)
+		p := New(l, false)
 		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
@@ -101,7 +101,7 @@ func TestIdentifierExpression(t *testing.T) {
 	input := "foobar;"
 
 	l := lexer.New(input)
-	p := New(l, true)
+	p := New(l, false)
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
@@ -132,7 +132,7 @@ func TestIntegerLiteralExpression(t *testing.T) {
 	input := "5;"
 
 	l := lexer.New(input)
-	p := New(l, true)
+	p := New(l, false)
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
@@ -173,7 +173,7 @@ func TestParsingPrefixExpression(t *testing.T) {
 
 	for _, tt := range prefixTests {
 		l := lexer.New(tt.input)
-		p := New(l, true)
+		p := New(l, false)
 		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
@@ -231,7 +231,7 @@ func TestParsingInfixExpression(t *testing.T) {
 
 	for _, tt := range infixTests {
 		l := lexer.New(tt.input)
-		p := New(l, true)
+		p := New(l, false)
 		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
@@ -356,7 +356,7 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 
 	for _, tt := range tests {
 		l := lexer.New(tt.input)
-		p := New(l, true)
+		p := New(l, false)
 		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
@@ -371,7 +371,7 @@ func TestBooleanExpression(t *testing.T) {
 	input := `true;`
 
 	l := lexer.New(input)
-	p := New(l, true)
+	p := New(l, false)
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
@@ -402,7 +402,7 @@ func TestIfExpression(t *testing.T) {
 	input := `if (x < y) { x }`
 
 	l := lexer.New(input)
-	p := New(l, true)
+	p := New(l, false)
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
@@ -446,7 +446,7 @@ func TestIfElseExpression(t *testing.T) {
 	input := `if (x < y) { x } else { y }`
 
 	l := lexer.New(input)
-	p := New(l, true)
+	p := New(l, false)
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
@@ -499,7 +499,7 @@ func TestFunctionLiteralParsing(t *testing.T) {
 	input := `fn(x, y) { x + y; }`
 
 	l := lexer.New(input)
-	p := New(l, true)
+	p := New(l, false)
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
@@ -548,7 +548,7 @@ func TestFunctionParameterParsing(t *testing.T) {
 
 	for _, tt := range tests {
 		l := lexer.New(tt.input)
-		p := New(l, true)
+		p := New(l, false)
 		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
@@ -570,7 +570,7 @@ func TestCallExpressionParsing(t *testing.T) {
 	input := "add(1, 2 * 3, 4 + 5);"
 
 	l := lexer.New(input)
-	p := New(l, true)
+	p := New(l, false)
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
@@ -615,20 +615,36 @@ func checkParserErrors(t *testing.T, p *Parser) {
 	t.FailNow()
 }
 
+func TestStringLiteralExpression(t *testing.T) {
+	input := `"hello world";`
+	l := lexer.New(input)
+	p := New(l, false)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+	statement := program.Statements[0].(*ast.ExpressionStatement)
+	literal, ok := statement.Expression.(*ast.StringLiteral)
+	if !ok {
+		t.Fatalf("expression not *ast.StringLiteral. got=%T", statement.Expression)
+	}
+	if literal.Value != "hello world" {
+		t.Errorf("literal.Value not %q. got=%q", "hello world", literal.Value)
+	}
+}
+
 func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
-	integ, ok := il.(*ast.IntegerLiteral)
+	integer, ok := il.(*ast.IntegerLiteral)
 	if !ok {
 		t.Errorf("il not *ast.IntegerLiteral. got=%T", il)
 		return false
 	}
 
-	if integ.Value != value {
-		t.Errorf("integ.Value not %d. got=%d", value, integ.Value)
+	if integer.Value != value {
+		t.Errorf("integer.Value not %d. got=%d", value, integer.Value)
 		return false
 	}
 
-	if integ.TokenLiteral() != fmt.Sprintf("%d", value) {
-		t.Errorf("integ.TokenLiteral not %d. got=%s", value, integ.TokenLiteral())
+	if integer.TokenLiteral() != fmt.Sprintf("%d", value) {
+		t.Errorf("integer.TokenLiteral not %d. got=%s", value, integer.TokenLiteral())
 		return false
 	}
 
