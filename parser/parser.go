@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
+	"monkey/ast"
 	"monkey/lexer"
 	"monkey/token"
-	"monkey/ast"
 )
 
 const (
@@ -22,7 +22,7 @@ const (
 
 var precedences = map[token.TokenType]int{
 	token.EQ:       EQUALS,
-	token.NOTEQ:    EQUALS,
+	token.NOT_EQ:   EQUALS,
 	token.LT:       LESSGREATER,
 	token.GT:       LESSGREATER,
 	token.PLUS:     SUM,
@@ -32,7 +32,6 @@ var precedences = map[token.TokenType]int{
 	token.LPAREN:   CALL,
 }
 
-// Parser 実体
 type Parser struct {
 	l         *lexer.Lexer
 	errors    []string
@@ -43,7 +42,6 @@ type Parser struct {
 	infixParseFns  map[token.TokenType]infixParseFn
 }
 
-// 演算子の構文解析用
 type (
 	prefixParseFn func() ast.Expression
 	infixParseFn  func(ast.Expression) ast.Expression
@@ -51,7 +49,6 @@ type (
 
 var isTrace bool
 
-// New Parserの初期化
 func New(l *lexer.Lexer, trasing bool) *Parser {
 	p := &Parser{
 		l:      l,
@@ -77,24 +74,21 @@ func New(l *lexer.Lexer, trasing bool) *Parser {
 	p.registerInfix(token.SLASH, p.parseInfixExpression)
 	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
-	p.registerInfix(token.NOTEQ, p.parseInfixExpression)
+	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 
-	// 2つトークンを読みこむ。curTokenとpeekTokenの両方がセットされる。
 	p.nextToken()
 	p.nextToken()
 
 	return p
 }
 
-// Errors エラーの返却
 func (p *Parser) Errors() []string {
 	return p.errors
 }
 
-// ParseProgram .
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
