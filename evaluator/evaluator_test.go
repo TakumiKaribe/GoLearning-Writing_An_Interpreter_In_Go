@@ -3,8 +3,8 @@ package evaluator
 import (
 	"testing"
 
-	"moneky/lexer"
-	"moneky/object"
+	"monkey/lexer"
+	"monkey/object"
 	"monkey/parser"
 )
 
