@@ -7,6 +7,7 @@ import (
 
 	"monkey/evaluator"
 	"monkey/lexer"
+	"monkey/object"
 	"monkey/parser"
 )
 
@@ -16,6 +17,7 @@ const PROMPT = ">> "
 // Start REPLの起動
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnvironment()
 
 	for {
 		fmt.Printf(PROMPT)
@@ -34,7 +36,7 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		evalated := evaluator.Eval(program)
+		evalated := evaluator.Eval(program, env)
 		if evalated != nil {
 			io.WriteString(out, evalated.Inspect())
 			io.WriteString(out, "\n\n")
